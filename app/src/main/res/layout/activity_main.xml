@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Header Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MediTrack"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@color/orange"
+        android:gravity="center"
+        android:padding="20dp"
+        android:background="@color/white"
+        android:elevation="4dp" />
+
+    <!-- Add Button Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="Add Medicine"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/orange"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Medicine List Section with Centered Background Logo -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Centered, blurred, light logo -->
+        <ImageView
+            android:id="@+id/bgLogo"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logo"
+            android:alpha="0.15"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/app_name"
+            android:clickable="false"
+            android:focusable="false" />
+
+        <!-- Medicines RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:background="@android:color/transparent" />
+
+        <!-- Empty State Message -->
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No medicine scheduled for today"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="24dp"
+            android:background="@android:color/transparent"/>
+    </FrameLayout>
+</LinearLayout>
