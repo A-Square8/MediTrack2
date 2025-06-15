@@ -27,9 +27,20 @@
 
         <Button
             android:id="@+id/btnAdd"
-            android:layout_width="200dp"
+            android:layout_width="180dp"
             android:layout_height="50dp"
             android:text="Add Medicine"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/orange"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/btnView"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="View All"
             android:textColor="@color/white"
             android:backgroundTint="@color/orange"
             android:textSize="16sp"

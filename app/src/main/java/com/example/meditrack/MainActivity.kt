@@ -12,7 +12,6 @@ import android.widget.TextView
 import android.app.AlarmManager
 import android.app.PendingIntent
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
@@ -28,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         dbHelper = DatabaseHelper(this)
 
         val btnAdd: Button = findViewById(R.id.btnAdd)
+        val btnView: Button = findViewById(R.id.btnView)
         recyclerView = findViewById(R.id.recyclerView)
 
         setupRecyclerView()
@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
 
         btnAdd.setOnClickListener {
             startActivity(Intent(this, AddMedicineActivity::class.java))
+        }
+
+        btnView.setOnClickListener {
+            startActivity(Intent(this, ViewAllMedicinesActivity::class.java))
         }
     }
 
@@ -75,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         }
         val pendingIntent = PendingIntent.getBroadcast(
             this,
-            (medicine.id + 100000).toInt(), // Use the same ID as when scheduling the follow-up alarm
+            (medicine.id + 100000).toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -86,7 +90,6 @@ class MainActivity : AppCompatActivity() {
         val allMedicines = dbHelper.getAllMedicines()
         val today = java.text.SimpleDateFormat("EEEE", java.util.Locale.getDefault()).format(java.util.Date())
         val todayMedicines = allMedicines.filter { medicine ->
-
             medicine.days.split(",").map { it.trim() }.contains(today)
         }
 
@@ -102,7 +105,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun checkAndResetDailyCheckboxes() {
         val sharedPrefs = getSharedPreferences("MediTrack", Context.MODE_PRIVATE)
         val lastResetDate = sharedPrefs.getString("last_reset_date", "")
@@ -110,15 +112,13 @@ class MainActivity : AppCompatActivity() {
             .format(java.util.Date())
 
         if (lastResetDate != currentDate) {
-            // Reset all checkboxes for new day
             dbHelper.resetDailyCheckboxes()
-
-            // Save current date
             sharedPrefs.edit()
                 .putString("last_reset_date", currentDate)
                 .apply()
         }
     }
+
     private fun cancelMedicineAlarm(medicine: Medicine) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java).apply {
@@ -133,5 +133,4 @@ class MainActivity : AppCompatActivity() {
         )
         alarmManager.cancel(pendingIntent)
     }
-
 }
