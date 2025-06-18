@@ -147,61 +147,98 @@ class AddMedicineActivity : AppCompatActivity() {
 
     private fun setupAlarms(medicine: Medicine) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         val timeParts = medicine.time.split(":")
         val hour = timeParts[0].toInt()
         val minute = timeParts[1].toInt()
 
-        // 1. Alarm 30 minutes before
-        val calendarBefore = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute - 30)
-            set(Calendar.SECOND, 0)
-        }
-        val intentBefore = Intent(this, AlarmReceiver::class.java).apply {
-            putExtra("medicine_name", medicine.name)
-            putExtra("dose", medicine.dose)
-            putExtra("type", "reminder")
-            putExtra("medicine_id", medicine.id)
-        }
-        val pendingIntentBefore = PendingIntent.getBroadcast(
-            this,
-            medicine.id.toInt(),
-            intentBefore,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendarBefore.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntentBefore
-        )
+        val selectedDays = medicine.days.split(",").map { it.trim() }
 
-        // 2. Follow-up alarm 30 minutes after scheduled time
-        val calendarFollowUp = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute + 30)
-            set(Calendar.SECOND, 0)
+        // Set alarms for each selected day
+        selectedDays.forEach { dayName ->
+            val dayOfWeek = when(dayName) {
+                "Sunday" -> Calendar.SUNDAY
+                "Monday" -> Calendar.MONDAY
+                "Tuesday" -> Calendar.TUESDAY
+                "Wednesday" -> Calendar.WEDNESDAY
+                "Thursday" -> Calendar.THURSDAY
+                "Friday" -> Calendar.FRIDAY
+                "Saturday" -> Calendar.SATURDAY
+                else -> return@forEach
+            }
+
+            // Main reminder alarm (30 minutes before)
+            val calendarBefore = Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_WEEK, dayOfWeek)
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, minute - 30)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+
+                // If the time has passed this week, schedule for next week
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(Calendar.WEEK_OF_YEAR, 1)
+                }
+            }
+
+            val intentBefore = Intent(this, AlarmReceiver::class.java).apply {
+                putExtra("medicine_name", medicine.name)
+                putExtra("dose", medicine.dose)
+                putExtra("type", "reminder")
+                putExtra("medicine_id", medicine.id)
+                putExtra("day_of_week", dayOfWeek)
+            }
+
+            val pendingIntentBefore = PendingIntent.getBroadcast(
+                this,
+                (medicine.id.toInt() * 10 + dayOfWeek), // Unique ID per day
+                intentBefore,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                calendarBefore.timeInMillis,
+                AlarmManager.INTERVAL_DAY * 7, // Weekly repeat
+                pendingIntentBefore
+            )
+
+            // Follow-up alarm (30 minutes after)
+            val calendarFollowUp = Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_WEEK, dayOfWeek)
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, minute + 30)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(Calendar.WEEK_OF_YEAR, 1)
+                }
+            }
+
+            val intentFollowUp = Intent(this, AlarmReceiver::class.java).apply {
+                putExtra("medicine_name", medicine.name)
+                putExtra("dose", medicine.dose)
+                putExtra("type", "followup")
+                putExtra("medicine_id", medicine.id)
+                putExtra("day_of_week", dayOfWeek)
+            }
+
+            val pendingIntentFollowUp = PendingIntent.getBroadcast(
+                this,
+                (medicine.id.toInt() * 10 + dayOfWeek + 100), // Unique ID for follow-up
+                intentFollowUp,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                calendarFollowUp.timeInMillis,
+                AlarmManager.INTERVAL_DAY * 7,
+                pendingIntentFollowUp
+            )
         }
-        val intentFollowUp = Intent(this, AlarmReceiver::class.java).apply {
-            putExtra("medicine_name", medicine.name)
-            putExtra("dose", medicine.dose)
-            putExtra("type", "followup")
-            putExtra("medicine_id", medicine.id)
-        }
-        val pendingIntentFollowUp = PendingIntent.getBroadcast(
-            this,
-            (medicine.id + 100000).toInt(), // Unique request code for follow-up
-            intentFollowUp,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendarFollowUp.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntentFollowUp
-        )
     }
+
 
 
     private fun setupDailyReset() {

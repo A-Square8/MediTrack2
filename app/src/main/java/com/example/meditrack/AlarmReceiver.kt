@@ -1,5 +1,8 @@
 package com.example.meditrack
 
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,7 +14,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.app.NotificationManager
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -41,20 +45,38 @@ class AlarmReceiver : BroadcastReceiver() {
     private fun handleMarkAsTaken(context: Context, intent: Intent) {
         val medicineId = intent.getLongExtra("medicine_id", -1)
         val notificationId = intent.getIntExtra("notification_id", -1)
+        val dayOfWeek = intent.getIntExtra("day_of_week", -1)
 
         if (medicineId != -1L) {
-            // Update database - mark medicine as taken
+            // Update main database
             val dbHelper = DatabaseHelper(context)
             dbHelper.updateMedicineStatus(medicineId, true)
 
-            // Stop the alarm sound
-            stopAlarmSound()
+            // Update analytics database (keep Version 2 feature)
+            val analyticsDb = AnalyticsDbHelper(context)
+            val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            val dateString = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            analyticsDb.logMedicineTaken(medicineId, currentTime, dateString)
 
-            // Cancel the notification
+            // Cancel follow-up alarm for today
+            if (dayOfWeek != -1) {
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val followUpIntent = Intent(context, AlarmReceiver::class.java)
+                val followUpPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    (medicineId.toInt() * 10 + dayOfWeek + 100),
+                    followUpIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                alarmManager.cancel(followUpPendingIntent)
+            }
+
+            // Stop alarm sound and cancel notification
+            stopAlarmSound()
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancel(notificationId)
 
-            // Show confirmation notification
+            // Show confirmation
             val notificationHelper = NotificationHelper(context)
             notificationHelper.showSimpleNotification(
                 "Medicine Taken",
@@ -69,13 +91,27 @@ class AlarmReceiver : BroadcastReceiver() {
         val dose = intent.getStringExtra("dose") ?: ""
         val medicineId = intent.getLongExtra("medicine_id", -1)
         val type = intent.getStringExtra("type") ?: "reminder"
+        val scheduledDayOfWeek = intent.getIntExtra("day_of_week", -1)
 
-        // Only play sound for reminder notifications, not follow-up
+        // Validate if today matches the scheduled day
+        val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+        if (scheduledDayOfWeek != -1 && scheduledDayOfWeek != today) {
+            return
+        }
+
+        // Check if medicine is already taken today
+        val dbHelper = DatabaseHelper(context)
+        val medicine = dbHelper.getAllMedicines().find { it.id == medicineId }
+        if (medicine?.isConsumed == true && type == "followup") {
+            return // Don't show follow-up if already taken
+        }
+
+        // Only play sound for reminder notifications
         if (type == "reminder") {
             playAlarmSound(context)
         }
 
-        // Create notification with "Mark As Taken" action
+        // Create notification
         val notificationHelper = NotificationHelper(context)
         val notificationId = medicineId.toInt()
 
@@ -86,6 +122,7 @@ class AlarmReceiver : BroadcastReceiver() {
             medicineId
         )
     }
+
 
     private fun playAlarmSound(context: Context) {
         try {

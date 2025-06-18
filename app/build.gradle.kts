@@ -47,5 +47,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation ("com.itextpdf:itextpdf:5.5.13.3")
     implementation ("androidx.core:core:1.12.0")
+    implementation ("androidx.cardview:cardview:1.0.0")
 
 }
