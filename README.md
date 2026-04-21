@@ -1,15 +1,15 @@
 # MediTrack - Medicine Reminder Android App
 
-> **⚠️ Important Setup Notes:**
+> ** Important Setup Notes:**
 > - **Grant permissions manually** in Android Settings → Apps → MediTrack → Permissions for optimal functionality
 > - **Use light mode** for the best visual experience - avoid dark mode for proper UI display
 
 A comprehensive Android application for tracking and managing medicine schedules with smart notifications, analytics, and PDF reporting capabilities.
 
-## 📱 Demo and functional apk
+##  Demo and functional apk
 https://drive.google.com/drive/folders/18XHz6SSW8w3i6B8JWD1ifiPVnokrnR6y?usp=sharing
 
-## 📱 Features
+##  Features
 
 ### Core Functionality
 - **Medicine Management**: Add, view, and delete medicine schedules with customizable dosing options
@@ -23,7 +23,7 @@ https://drive.google.com/drive/folders/18XHz6SSW8w3i6B8JWD1ifiPVnokrnR6y?usp=sha
 - **Sound Alarms**: Audio notifications with automatic 30-second timeout and volume control
 - **Persistent Storage**: SQLite database with dual database architecture for main data and analytics
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Component | Technology |
 |-----------|------------|
@@ -35,7 +35,7 @@ https://drive.google.com/drive/folders/18XHz6SSW8w3i6B8JWD1ifiPVnokrnR6y?usp=sha
 | **PDF Generation** | iTextPDF library for comprehensive report generation |
 | **Architecture** | MVVM pattern with data classes and proper separation of concerns |
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 app/src/main/
@@ -60,7 +60,7 @@ app/src/main/
     └── mipmap-*/                    # App icons for different densities
 ```
 
-## 🚀 Installation
+##  Installation
 
 ### Prerequisites
 - **Android Studio**: Arctic Fox or later
@@ -86,7 +86,7 @@ app/src/main/
    ./gradlew installDebug
    ```
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### Adding Medicines
 1. Tap the **"Add"** button on the main dashboard
@@ -111,9 +111,9 @@ app/src/main/
 - Download comprehensive PDF reports with medicine history
 - Export medicine schedules as formatted PDF documents
 
-## 🔐 Permissions Required
+##  Permissions Required
 
-> **⚠️ Manual Permission Setup Required**
+> ** Manual Permission Setup Required**
 > 
 > After installation, manually grant these permissions in:
 > **Settings → Apps → MediTrack → Permissions**
@@ -132,7 +132,7 @@ app/src/main/
 - **Exact Alarms**: Essential for precise timing
 - **Storage**: Needed for PDF report generation
 
-## 🏗️ Key Components
+##  Key Components
 
 ### Database Architecture
 
@@ -160,7 +160,7 @@ app/src/main/
 - **Historical Data**: Complete medicine history with deletion tracking
 - **Weekly Trends**: Adherence patterns over time with visual representation
 
-## 🎨 Development Features
+##  Development Features
 
 ### Responsive Design
 - Material Design components with custom orange theme
@@ -180,7 +180,7 @@ app/src/main/
 - Toast notifications for user feedback
 - Confirmation dialogs for destructive actions
 
-## 🤝 Contributing
+##  Contributing
 
 ### Development Workflow
 1. Fork the repository and create a feature branch
@@ -195,11 +195,11 @@ app/src/main/
 - Follow Android architecture best practices
 - Maintain consistent code formatting and documentation
 
-## 📄 License
+##  License
 
 This project is licensed under the **MIT License**, allowing for both personal and commercial use with proper attribution.
 
-## 🆘 Support and Troubleshooting
+##  Support and Troubleshooting
 
 ### Common Issues
 
@@ -217,7 +217,7 @@ This project is licensed under the **MIT License**, allowing for both personal a
 
 ---
 
-> **💡 Pro Tips:**
+> ** Pro Tips:**
 > - **Always use light mode** for optimal visual experience
 > - **Grant all permissions manually** during first setup
 > - Test notifications after installation to ensure proper functionality
